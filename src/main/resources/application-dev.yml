@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: FintechApp
+  datasource:
+    url: jdbc:postgresql://postgres.c7wmcyayepan.eu-north-1.rds.amazonaws.com:5432/postgres?schema=public
+    username: postgres
+    password: Durga!n2024
+  jpa:
+    hibernate:
+#      ddl-auto: update
+    show-sql: true
+server:
+  servlet:
+    port: 8080
+    contextPath: /fintech
