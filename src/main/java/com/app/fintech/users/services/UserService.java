@@ -4,28 +4,38 @@ import com.app.fintech.users.dtos.CreateUserDTO;
 import com.app.fintech.users.dtos.UserDTO;
 import com.app.fintech.users.entities.User;
 import com.app.fintech.users.repositories.UserRepository;
+import com.app.fintech.exceptions.UserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    @Lazy
+    private PasswordEncoder passwordEncoder;
 
     private static Logger log = LoggerFactory.getLogger(UserService.class);
 
     public UserDTO getUserById(String id){
         User user = userRepository.findById(Long.valueOf(id))
                 .orElseThrow(()->
-                        new RuntimeException("User is not avaialble with this id:-"+id)
+                        new UserNotFoundException("User is not avaialble with this id:-"+id)
                 );
         return getBuild(user);
     }
@@ -43,7 +53,7 @@ public class UserService {
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .role(user.getRole())
-                .password(user.getPassword())
+                .password(passwordEncoder.encode(user.getPassword()))
                 .createdAt(LocalDate.now())
                 .updatedAt(LocalDate.now())
                 .build());
@@ -67,5 +77,14 @@ public class UserService {
                 .email(user.getEmail())
                 .role(user.getRole())
                 .build();
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), user.getAuthorities());
     }
 }
