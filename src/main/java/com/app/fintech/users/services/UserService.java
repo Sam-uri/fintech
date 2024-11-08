@@ -7,6 +7,8 @@ import com.app.fintech.users.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -19,6 +21,10 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    @Lazy
+    private PasswordEncoder passwordEncoder;
 
     private static Logger log = LoggerFactory.getLogger(UserService.class);
 
@@ -43,7 +49,7 @@ public class UserService {
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .role(user.getRole())
-                .password(user.getPassword())
+                .password(passwordEncoder.encode(user.getPassword()))
                 .createdAt(LocalDate.now())
                 .updatedAt(LocalDate.now())
                 .build());
