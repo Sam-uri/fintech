@@ -1,6 +1,8 @@
 spring:
   application:
     name: FintechApp
+    env: local
+
   datasource:
     url:
     username:
@@ -18,9 +20,16 @@ logging:
     hibernate:
     #      ddl-auto: update
     show-sql: true
+
 server:
   servlet:
     port: 8080
     contextPath: /fintech
 
-secretKey: fintech
+jwt:
+  secret:
+  access:
+    expiration:
+    header:
+    prefix:
+    refresh-token-expiration:

@@ -34,10 +34,4 @@ public class User {
     private LocalDate updatedAt;
     @OneToMany(mappedBy = "user")
     private Set<Account> accounts;
-
-
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
-    }
-
 }
