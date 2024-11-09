@@ -33,3 +33,25 @@ jwt:
     header:
     prefix:
     refresh-token-expiration:
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    show-details: always
+  security:
+    enabled: true
+    basic:
+      enabled: true
+      auth:
+        users:
+          - name:
+            password:
