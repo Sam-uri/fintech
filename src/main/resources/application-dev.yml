@@ -1,15 +1,56 @@
 spring:
   application:
     name: FintechApp
+    env: dev
+
   datasource:
-    url: jdbc:postgresql://postgres.c7wmcyayepan.eu-north-1.rds.amazonaws.com:5432/postgres?schema=public
-    username: postgres
-    password: Durga!n2024
+    url:
+    username:
+    password:
+
+logging:
+  level:
+    org:
+      springframework:
+        web:
+          filter:
+            CommonsRequestLoggingFilter: DEBUG
+
   jpa:
     hibernate:
-#      ddl-auto: update
+    #      ddl-auto: update
     show-sql: true
 server:
   servlet:
     port: 8080
     contextPath: /fintech
+
+jwt:
+  secret:
+  access:
+    expiration: 600000
+    header: Authorization
+    prefix: Bearer
+    refresh-token-expiration: 6000000
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    show-details: always
+  security:
+    enabled: true
+    basic:
+      enabled: true
+      auth:
+        users:
+          - name:
+            password:

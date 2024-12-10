@@ -7,17 +7,24 @@ import com.app.fintech.accounts.entities.Account;
 import com.app.fintech.accounts.enums.AccountType;
 import com.app.fintech.accounts.repositories.AccountRepository;
 
+import com.app.fintech.exceptions.AccountNotFoundException;
+import com.app.fintech.exceptions.InvalidRequestException;
 import com.app.fintech.users.entities.User;
 import com.app.fintech.users.services.UserService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
 
 @Service
+@EnableAsync
 public class AccountService {
 
     @Autowired
@@ -42,7 +49,7 @@ public class AccountService {
                 .balance(acc.getBalance())
                 .build();
     }
-
+    @Transactional
     public AccountDTO createAccount(CreateAccountDTO accountDTO) {
         User user = userService.getUserEntityById(accountDTO.getUserId());
         Account accountEntity = accountRepository.saveAndFlush(Account.builder()
@@ -59,14 +66,17 @@ public class AccountService {
     private Account findById(String accId){
        return accountRepository.findById(Long.valueOf(accId))
                 .orElseThrow(()->
-                        new RuntimeException("Account is not available with this id:-"+accId)
+                        new AccountNotFoundException("Account is not available with this id:-"+accId)
                 );
     }
+    @Async
+    @Transactional
     public String performTransaction(String accountId, TransactionDTO transaction) {
 
         Account senderAccount = findById(accountId);
         if(transaction.getTransferAmount() > senderAccount.getBalance()){
             log.warn("insufficient funds for account"+senderAccount.getId());
+            log.error(String.valueOf(new InvalidRequestException("unable to transfer the fund")));
             return "insufficient funds";
         }
         Account targetAccount = findById(transaction.getTargetAccountId());
